@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Currency Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        div {
+            margin: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-size: 20px;
+        }
+
+        span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Currency Converter</h1>
+    <div>
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" step="0.01">
+    </div>
+    <div>
+        <label for="fromCurrency">From Currency:</label>
+        <select id="fromCurrency">
+            <!-- Add currency options here -->
+        </select>
+    </div>
+    <div>
+        <label for="toCurrency">To Currency:</label>
+        <select id="toCurrency">
+            <!-- Add currency options here -->
+        </select>
+    </div>
+    <div>
+        <button id="convertButton">Convert</button>
+    </div>
+    <div>
+        <p><span id="result"></span></p>
+    </div>
+
+    <script>
+        const convertButton = document.getElementById('convertButton');
+        const resultElement = document.getElementById('result');
+
+        // Add currency options and ISO codes
+        const currencies = {
+            USD: 'United States Dollar',
+            INR: 'Indian Rupee',
+            EUR: 'Euro',
+            GBP: 'British Pound Sterling',
+            JPY: 'Japanese Yen',
+            AUD: 'Australian Dollar',
+            CAD: 'Canadian Dollar',
+            CNY: 'Yuan Renminbi',
+            NZD: 'New Zealand Dollar',
+            FJD: 'Fiji Dollar',
+            HKD: 'Hong Kong Dollar',
+            MXN: 'Mexican Peso',
+            LKR: 'Sri Lanka Rupee',
+
+
+            // Add more currencies and ISO codes
+        };
+
+        // Populate the currency select options
+        const fromCurrencySelect = document.getElementById('fromCurrency');
+        const toCurrencySelect = document.getElementById('toCurrency');
+
+        for (const currencyCode in currencies) {
+            const option = document.createElement('option');
+            option.value = currencyCode;
+            option.textContent = currencyCode + ' - ' + currencies[currencyCode];
+            fromCurrencySelect.appendChild(option.cloneNode(true));
+            toCurrencySelect.appendChild(option.cloneNode(true));
+        }
+
+        convertButton.addEventListener('click', function () {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+
+            if (!amount || isNaN(amount)) {
+                alert('Please enter a valid amount.');
+                return;
+            }
+
+            // Construct the API URL for conversion
+            const apiUrl = `https://v6.exchangerate-api.com/v6/27c599d8185f527d63681d9a/latest/${fromCurrency}`;
+
+            // Fetch the exchange rates
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.conversion_rates && data.conversion_rates[toCurrency]) {
+                        const convertedAmount = amount * data.conversion_rates[toCurrency];
+                        resultElement.textContent = `Result: ${convertedAmount.toFixed(2)} ${toCurrency}`;
+                    } else {
+                        resultElement.textContent = 'Conversion rate not found.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rates:', error);
+                    resultElement.textContent = 'Error fetching exchange rates.';
+                });
+        });
+    </script>
+</body>
+</html>
